@@ -37,6 +37,7 @@ async def send_notification(app: Client, gift_id: int, **kwargs) -> None:
         'sold_out_summary': lambda: t("telegram.sold_out_summary", count=kwargs.get('count', 0)),
         'non_limited_summary': lambda: t("telegram.non_limited_summary", count=kwargs.get('count', 0)),
         'non_upgradable_summary': lambda: t("telegram.non_upgradable_summary", count=kwargs.get('count', 0)),
+        'excluded_gifts_summary': lambda: t("telegram.excluded_gifts_summary", count=kwargs.get('count', 0)),
         'gift_price_error': lambda: t("telegram.gift_price", gift_id=gift_id,
                                       price=kwargs.get('gift_price'),
                                       supply_text=supply_text),
@@ -59,5 +60,6 @@ async def send_start_message(client: Client) -> None:
                 balance=balance,
                 min_price=config.MIN_GIFT_PRICE,
                 max_price=config.MAX_GIFT_PRICE,
-                quantity=config.GIFT_QUANTITY)
+                quantity=config.GIFT_QUANTITY,
+                excluded_gifts=config.EXCLUDED_GIFTS_IDS)
     await send_message(client, message)

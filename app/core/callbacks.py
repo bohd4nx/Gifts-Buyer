@@ -11,19 +11,23 @@ from data.config import config, t
 _skipped_sold_out_gifts = 0
 _skipped_non_limited_gifts = 0
 _skipped_non_upgradable_gifts = 0
-
+_skipped_excluded_gifts = 0
 
 class GiftFilter:
 
     @staticmethod
     async def check_gift_eligibility(gift_data: Dict[str, Any]) -> Tuple[bool, Dict[str, Any]]:
-        global _skipped_sold_out_gifts, _skipped_non_limited_gifts, _skipped_non_upgradable_gifts
+        global _skipped_sold_out_gifts, _skipped_non_limited_gifts, _skipped_non_upgradable_gifts, _skipped_excluded_gifts
         gift_price = gift_data.get("price", 0)
         is_limited = gift_data.get("is_limited", False)
         is_sold_out = gift_data.get("is_sold_out", False)
+        is_excluded = gift_data.get("id", 0)
         is_upgradable = "upgrade_price" in gift_data
         total_amount = gift_data.get("total_amount", "N/A") if is_limited else "N/A"
-
+        if is_excluded in config.EXCLUDED_GIFTS_IDS:
+            _skipped_excluded_gifts += 1
+            return False, {}
+        
         if is_sold_out:
             _skipped_sold_out_gifts += 1
             return False, {}
@@ -67,7 +71,12 @@ async def new_callback(app: Client, gift_data: Dict[str, Any]) -> None:
 
 
 async def process_skipped_gifts(app: Client) -> None:
-    global _skipped_sold_out_gifts, _skipped_non_limited_gifts, _skipped_non_upgradable_gifts
+    global _skipped_sold_out_gifts, _skipped_non_limited_gifts, _skipped_non_upgradable_gifts, _skipped_excluded_gifts
+
+    if _skipped_excluded_gifts > 0:
+        info(t("console.excluded_gifts_summary", count=_skipped_excluded_gifts))
+        await send_notification(app, 0, excluded_gifts_summary=True, count=_skipped_excluded_gifts)
+        _skipped_excluded_gifts = 0
 
     if _skipped_sold_out_gifts > 0:
         info(t("console.sold_out_gifts_summary", count=_skipped_sold_out_gifts))
@@ -80,6 +89,11 @@ async def process_skipped_gifts(app: Client) -> None:
         _skipped_non_limited_gifts = 0
 
     if _skipped_non_upgradable_gifts > 0:
+        info(t("console.non_upgradable_gifts_summary", count=_skipped_non_upgradable_gifts))
+        await send_notification(app, 0, non_upgradable_summary=True, count=_skipped_non_upgradable_gifts)
+        _skipped_non_upgradable_gifts = 0
+
+    if _skipped_excluded_gifts > 0:
         info(t("console.non_upgradable_gifts_summary", count=_skipped_non_upgradable_gifts))
         await send_notification(app, 0, non_upgradable_summary=True, count=_skipped_non_upgradable_gifts)
         _skipped_non_upgradable_gifts = 0

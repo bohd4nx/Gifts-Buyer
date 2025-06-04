@@ -15,7 +15,8 @@ telegram:
     <b>📝 Gift purchase logic:</b>
     <blockquote>According to your settings:
     • Gifts in the price range <b>%{min_price}-%{max_price} ⭐</b> will be purchased
-    • Each matching gift will be sent <b>%{quantity}x</b> times</blockquote>
+    • Each matching gift will be sent <b>%{quantity}x</b> times
+    • Gifts with id <b>%{excluded_gifts}</b> are excluded from purchase</blockquote>
 
     <i>💡 Gifts outside the specified criteria will be automatically skipped</i>
   peer_id_error: |
@@ -29,6 +30,7 @@ telegram:
   sold_out_summary: "<b>⚠️ Skipped %{count} sold out gifts</b>"
   non_limited_summary: "<b>⚠️ Skipped %{count} non-limited gifts</b>"
   non_upgradable_summary: "<b>⚠️ Skipped %{count} non-upgradable gifts</b>"
+  excluded_gifts_summary: "<b>⚠️ Skipped %{count} gifts, according to change settings</b>"
   available: "Available"
 
 console:
@@ -43,3 +45,4 @@ console:
   sold_out_gifts_summary: "Skipped %{count} sold out gifts"
   non_limited_gifts_summary: "Skipped %{count} non-limited gifts"
   non_upgradable_gifts_summary: "Skipped %{count} non-upgradable gifts"
+  excluded_gifts_summary: "Skipped %{count} gifts, according to change settings"

@@ -63,6 +63,7 @@ class Config:
         self.USER_ID = self._parse_user_ids()
         self.MIN_GIFT_PRICE = self.config_parser.getint('Gifts', 'MIN_GIFT_PRICE', fallback=100000)
         self.MAX_GIFT_PRICE = self.config_parser.getint('Gifts', 'MAX_GIFT_PRICE', fallback=100000)
+        self.EXCLUDED_GIFTS_IDS = self._parse_excluded_gifts_ids()
         self.GIFT_QUANTITY = self.config_parser.getint('Gifts', 'GIFT_QUANTITY', fallback=1)
         self.PURCHASE_NON_LIMITED_GIFTS = self.config_parser.getboolean('Gifts', 'PURCHASE_NON_LIMITED_GIFTS',
                                                                         fallback=False)
@@ -83,7 +84,18 @@ class Config:
                 except ValueError:
                     user_ids.append(user_id)
         return user_ids
-
+    
+    def _parse_excluded_gifts_ids(self) -> List:
+        excluded_gifts_ids = []
+        for excluded_gifts_id in self.config_parser.get('Gifts', 'EXCLUDED_GIFTS_IDS', fallback='').split(','):
+            excluded_gifts_id = excluded_gifts_id.strip()
+            if excluded_gifts_id:
+                try:
+                    excluded_gifts_ids.append(int(excluded_gifts_id))
+                except ValueError:
+                    excluded_gifts_ids.append(excluded_gifts_id)
+        return excluded_gifts_ids
+    
     def _validate_config(self) -> None:
         validation_rules = {
             "Telegram > API_ID": lambda: self.API_ID == 0,
